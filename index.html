@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyDesk — College Work Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a2e;
+    --paper: #f5f0e8;
+    --cream: #ede8dc;
+    --accent: #c0392b;
+    --gold: #d4a017;
+    --muted: #7a7060;
+    --line: #d6cfbf;
+    --card: #faf7f2;
+    --done: #2ecc71;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 27px, var(--line) 27px, var(--line) 28px);
+  }
+
+  header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 2.5rem 2rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(192,57,43,0.18);
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: 30%;
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    background: rgba(212,160,23,0.12);
+  }
+  .header-inner {
+    max-width: 700px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+  .welcome-tag {
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+  }
+  header p {
+    color: rgba(245,240,232,0.6);
+    font-size: 0.92rem;
+    font-weight: 300;
+  }
+
+  main {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  .add-card {
+    background: var(--card);
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    padding: 1.6rem 1.8rem;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 4px 20px rgba(26,26,46,0.07);
+    position: relative;
+  }
+  .add-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    background: var(--accent);
+    border-radius: 12px 0 0 12px;
+  }
+  .add-card h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    margin-bottom: 1.2rem;
+    color: var(--ink);
+  }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .field-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    display: block;
+  }
+
+  textarea, input[type="text"], input[type="date"], input[type="time"], select {
+    width: 100%;
+    background: var(--paper);
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  textarea:focus, input:focus, select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(192,57,43,0.1);
+  }
+  textarea {
+    resize: none;
+    min-height: 90px;
+    line-height: 1.6;
+  }
+
+  .row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.9rem;
+  }
+
+  .priority-row {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .priority-btn {
+    flex: 1;
+    padding: 0.55rem;
+    border: 1.5px solid var(--line);
+    border-radius: 7px;
+    background: var(--paper);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.18s;
+    color: var(--muted);
+  }
+  .priority-btn.low.active  { background: #e8f5e9; border-color: #2ecc71; color: #1b7a3e; }
+  .priority-btn.mid.active  { background: #fff8e1; border-color: var(--gold); color: #7a5c00; }
+  .priority-btn.high.active { background: #fdecea; border-color: var(--accent); color: var(--accent); }
+  .priority-btn:hover { opacity: 0.85; }
+
+  .add-btn {
+    width: 100%;
+    padding: 0.85rem;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    border-radius: 9px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .add-btn:hover { background: var(--accent); }
+  .add-btn:active { transform: scale(0.98); }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  .section-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+  }
+  .count-badge {
+    background: var(--ink);
+    color: var(--paper);
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+  }
+
+  .filter-tabs {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 1.4rem;
+    flex-wrap: wrap;
+  }
+  .tab {
+    padding: 0.38rem 0.9rem;
+    border-radius: 20px;
+    border: 1.5px solid var(--line);
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all 0.18s;
+  }
+  .tab.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+  .task-list { display: flex; flex-direction: column; gap: 0.8rem; }
+
+  .task-card {
+    background: var(--card);
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    padding: 1.1rem 1.3rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    transition: box-shadow 0.2s, transform 0.15s;
+    animation: slideIn 0.3s ease both;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .task-card:hover { box-shadow: 0 4px 18px rgba(26,26,46,0.1); transform: translateY(-1px); }
+  .task-card.done { opacity: 0.55; }
+  .task-card.done .task-title { text-decoration: line-through; color: var(--muted); }
+
+  .priority-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+  .dot-low  { background: #2ecc71; }
+  .dot-mid  { background: var(--gold); }
+  .dot-high { background: var(--accent); }
+
+  .task-body { flex: 1; min-width: 0; }
+  .task-title {
+    font-weight: 600;
+    font-size: 0.97rem;
+    margin-bottom: 0.25rem;
+    word-break: break-word;
+  }
+  .task-subject {
+    font-size: 0.76rem;
+    color: var(--accent);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 0.35rem;
+  }
+  .task-due {
+    font-size: 0.8rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .due-overdue { color: var(--accent); font-weight: 600; }
+
+  .task-actions { display: flex; gap: 0.4rem; flex-shrink: 0; }
+  .icon-btn {
+    width: 30px; height: 30px;
+    border-radius: 7px;
+    border: 1.5px solid var(--line);
+    background: transparent;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem;
+    transition: all 0.18s;
+    color: var(--muted);
+  }
+  .icon-btn:hover { border-color: var(--ink); color: var(--ink); }
+  .icon-btn.done-btn:hover { border-color: var(--done); color: var(--done); }
+  .icon-btn.del-btn:hover  { border-color: var(--accent); color: var(--accent); }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--muted);
+  }
+  .empty-state .emoji { font-size: 2.5rem; margin-bottom: 0.6rem; }
+  .empty-state p { font-size: 0.9rem; }
+
+  .toast {
+    position: fixed;
+    bottom: 2rem; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--ink);
+    color: var(--paper);
+    padding: 0.7rem 1.4rem;
+    border-radius: 9px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    opacity: 0;
+    transition: all 0.3s;
+    pointer-events: none;
+    z-index: 999;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="welcome-tag">✦ Welcome back</div>
+    <h1>StudyDesk</h1>
+    <p>Your college work — organized, on time, done right.</p>
+  </div>
+</header>
+
+<main>
+  <div class="add-card">
+    <h2>Add New Task</h2>
+    <div class="field-group">
+      <div>
+        <span class="field-label">What's the work?</span>
+        <textarea id="taskDesc" placeholder="e.g. Write introduction for sociology essay, complete lab report for chemistry…"></textarea>
+      </div>
+      <div>
+        <span class="field-label">Subject / Course</span>
+        <input type="text" id="taskSubject" placeholder="e.g. Mathematics, History, Physics…">
+      </div>
+      <div class="row-2">
+        <div>
+          <span class="field-label">Due Date</span>
+          <input type="date" id="taskDate">
+        </div>
+        <div>
+          <span class="field-label">Due Time</span>
+          <input type="time" id="taskTime">
+        </div>
+      </div>
+      <div>
+        <span class="field-label">Priority</span>
+        <div class="priority-row">
+          <button class="priority-btn low" data-p="low">Low</button>
+          <button class="priority-btn mid active" data-p="mid">Medium</button>
+          <button class="priority-btn high" data-p="high">High</button>
+        </div>
+      </div>
+    </div>
+    <button class="add-btn" onclick="addTask()">＋ Add to Desk</button>
+  </div>
+
+  <div class="section-header">
+    <h2>Your Tasks</h2>
+    <span class="count-badge" id="taskCount">0</span>
+  </div>
+
+  <div class="filter-tabs">
+    <button class="tab active" data-filter="all" onclick="setFilter('all',this)">All</button>
+    <button class="tab" data-filter="pending" onclick="setFilter('pending',this)">Pending</button>
+    <button class="tab" data-filter="done" onclick="setFilter('done',this)">Done</button>
+    <button class="tab" data-filter="high" onclick="setFilter('high',this)">🔴 High</button>
+    <button class="tab" data-filter="overdue" onclick="setFilter('overdue',this)">⚠ Overdue</button>
+  </div>
+
+  <div class="task-list" id="taskList"></div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  let tasks = JSON.parse(localStorage.getItem('studydesk_tasks') || '[]');
+  let selectedPriority = 'mid';
+  let currentFilter = 'all';
+
+  const todayStr = new Date().toISOString().split('T')[0];
+  document.getElementById('taskDate').value = todayStr;
+  document.getElementById('taskTime').value = '23:59';
+
+  document.querySelectorAll('.priority-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.priority-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedPriority = btn.dataset.p;
+    });
+  });
+
+  function save() {
+    localStorage.setItem('studydesk_tasks', JSON.stringify(tasks));
+  }
+
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  function addTask() {
+    const desc    = document.getElementById('taskDesc').value.trim();
+    const subject = document.getElementById('taskSubject').value.trim();
+    const date    = document.getElementById('taskDate').value;
+    const time    = document.getElementById('taskTime').value;
+
+    if (!desc)    { toast('✏️ Please describe the work!'); return; }
+    if (!subject) { toast('📚 Add a subject name!'); return; }
+    if (!date)    { toast('📅 Pick a due date!'); return; }
+
+    tasks.unshift({ id: Date.now(), desc, subject, date, time, priority: selectedPriority, done: false });
+    save(); render();
+    toast('✅ Task added to your desk!');
+
+    document.getElementById('taskDesc').value = '';
+    document.getElementById('taskSubject').value = '';
+    document.getElementById('taskDate').value = todayStr;
+    document.getElementById('taskTime').value = '23:59';
+    document.querySelectorAll('.priority-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('.priority-btn.mid').classList.add('active');
+    selectedPriority = 'mid';
+  }
+
+  function toggleDone(id) {
+    const t = tasks.find(t => t.id === id);
+    if (t) { t.done = !t.done; save(); render(); }
+  }
+
+  function deleteTask(id) {
+    tasks = tasks.filter(t => t.id !== id);
+    save(); render();
+    toast('🗑 Task removed');
+  }
+
+  function isOverdue(task) {
+    if (task.done) return false;
+    const due = new Date(`${task.date}T${task.time || '23:59'}`);
+    return due < new Date();
+  }
+
+  function setFilter(f, el) {
+    currentFilter = f;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    render();
+  }
+
+  function render() {
+    const list = document.getElementById('taskList');
+    let filtered = tasks;
+    if (currentFilter === 'pending') filtered = tasks.filter(t => !t.done);
+    if (currentFilter === 'done')    filtered = tasks.filter(t => t.done);
+    if (currentFilter === 'high')    filtered = tasks.filter(t => t.priority === 'high' && !t.done);
+    if (currentFilter === 'overdue') filtered = tasks.filter(t => isOverdue(t));
+
+    document.getElementById('taskCount').textContent = tasks.filter(t => !t.done).length;
+
+    if (filtered.length === 0) {
+      list.innerHTML = `<div class="empty-state"><div class="emoji">${currentFilter === 'done' ? '🎉' : '📭'}</div><p>${currentFilter === 'done' ? 'Nothing done yet — get to it!' : 'No tasks here. Add something above!'}</p></div>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map(task => {
+      const due = new Date(`${task.date}T${task.time || '23:59'}`);
+      const overdue = isOverdue(task);
+      const dueStr = due.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+                   + (task.time ? ` at ${formatTime(task.time)}` : '');
+      return `
+        <div class="task-card ${task.done ? 'done' : ''}">
+          <span class="priority-dot dot-${task.priority}"></span>
+          <div class="task-body">
+            <div class="task-subject">${task.subject}</div>
+            <div class="task-title">${task.desc}</div>
+            <div class="task-due ${overdue ? 'due-overdue' : ''}">
+              ${overdue ? '⚠' : '📅'} ${dueStr}${overdue ? ' · OVERDUE' : ''}
+            </div>
+          </div>
+          <div class="task-actions">
+            <button class="icon-btn done-btn" onclick="toggleDone(${task.id})">${task.done ? '↩' : '✓'}</button>
+            <button class="icon-btn del-btn" onclick="deleteTask(${task.id})">✕</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function formatTime(t) {
+    const [h, m] = t.split(':').map(Number);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    return `${h % 12 || 12}:${String(m).padStart(2,'0')} ${ampm}`;
+  }
+
+  render();
+</script>
+</body>
+</html>

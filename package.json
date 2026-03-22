@@ -1,0 +1,27 @@
+{
+  "name": "studydesk",
+  "version": "1.0.0",
+  "description": "College work tracker desktop app",
+  "author": "StudyDesk",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder build --win"
+  },
+  "build": {
+    "appId": "com.studydesk.app",
+    "productName": "StudyDesk",
+    "win": {
+      "target": "nsis",
+      "icon": "icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "devDependencies": {
+    "electron": "^29.0.0",
+    "electron-builder": "^24.0.0"
+  }
+}
