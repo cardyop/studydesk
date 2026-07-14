@@ -9,17 +9,23 @@
     "build": "electron-builder build --win"
   },
   "build": {
-    "appId": "com.studydesk.app",
-    "productName": "StudyDesk",
-    "win": {
-      "target": "nsis",
-      "icon": "icon.ico"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true
-    }
+  "appId": "com.studydesk.app",
+  "productName": "StudyDesk",
+  "publish": {
+    "provider": "github",
+    "owner": "cardyop",
+    "repo": "studydesk"
   },
+  "win": {
+    "target": "nsis",
+    "icon": "icon.ico"
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true
+  }
+}
+,
   "devDependencies": {
     "electron": "^29.0.0",
     "electron-builder": "^24.0.0"
